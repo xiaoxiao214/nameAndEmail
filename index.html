@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>输入姓名</title>
+    <link rel="stylesheet" href="./index.css">
+    <script src="./vue.js"></script>
+    <script src="./vue-resource.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div class="username">
+            <input type="text" placeholder = "请输入姓名" v-model = "name">
+        </div>
+        <div class="mail">
+            <input type="text" placeholder = "请输入邮箱" v-model = "mail">
+        </div>
+        <div class="upload-btn" @click = "handleUpLoad">上传</div>
+        <div class="show-btn" @click = "ShowInfo">显示人物信息</div>
+        <ul class="person-list" v-show="dataList.length && showFocus">
+            <li class="person" v-for = "person in dataList" >{{person}}</li>
+        </ul>
+    </div>
+
+    <script>
+        const vm = new Vue({
+            el:'#app',
+            data:{
+                name:'',
+                mail:'',
+                msg:'',
+                showFocus:false,
+                dataList:[],
+            },
+            methods:{
+                handleUpLoad(){
+                    this.$http.post('https://developer.duyiedu.com/vue/setUserInfo',{
+                        name:this.name,
+                        mail:this.mail,
+                    }).then(res =>{
+                        this.msg = res.body.msg;
+                        
+                    }).catch( error =>{
+                        this.msg = error.body.msg;
+                    })
+                },
+                ShowInfo(){
+                    this.$http.get('https://developer.duyiedu.com/vue/getUserInfo').then(res =>{
+                        this.dataList = res.body.data;
+                        this.showFocus = true
+                    }
+                        
+                    )
+                }            },
+            watch:{
+                msg(){
+                    if(this.msg == ''){
+                        return
+                    }
+                    alert(this.msg)
+                }
+            }
+        })
+    </script>
+</body>
+</html>
